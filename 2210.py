@@ -19,6 +19,7 @@ QWidget{
 }
 QPushButton{
     height: 70px;
+    color: white;
     }''')
 
 main_layout = QVBoxLayout()
@@ -161,13 +162,14 @@ def a_AC():
     total_str = ''
 def a_C():
     global total_str
-    tmp_list = list(total_str)
-    tmp_str = ''
-    del tmp_list[-1]
-    for i in tmp_list:
-        tmp_str += i
-    total_str = tmp_str
-    total.setText(total_str)
+    if total_str:
+        tmp_list = list(total_str)
+        tmp_str = ''
+        del tmp_list[-1]
+        for i in tmp_list:
+            tmp_str += i
+        total_str = tmp_str
+        total.setText(total_str)
 defs_numbers = {}
 defs_numbers['1'] = a1
 defs_numbers['2'] = a2
