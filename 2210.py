@@ -93,7 +93,7 @@ main_layout.addLayout(h6_layout)
 
 def a1():
     global total_str
-    total_str += str(i)
+    total_str += '1'
     total.setText(total_str)
 def a2():
     global total_str
@@ -135,6 +135,39 @@ def a_plus():
     global total_str
     total_str += '+'
     total.setText(total_str)
+def a_minus():
+    global total_str
+    total_str += '-'
+    total.setText(total_str)
+def a_devision():
+    global total_str
+    total_str += '/'
+    total.setText(total_str)
+def a_multi():
+    global total_str
+    total_str += '*'
+    total.setText(total_str)
+def a_dot():
+    global total_str
+    total_str += '.'
+    total.setText(total_str)
+def a_percent():
+    global total_str
+    total_str += '%'
+    total.setText(total_str)
+def a_AC():
+    global total_str
+    total.clear()
+    total_str = ''
+def a_C():
+    global total_str
+    tmp_list = list(total_str)
+    tmp_str = ''
+    del tmp_list[-1]
+    for i in tmp_list:
+        tmp_str += i
+    total_str = tmp_str
+    total.setText(total_str)
 defs_numbers = {}
 defs_numbers['1'] = a1
 defs_numbers['2'] = a2
@@ -151,14 +184,66 @@ for i in range(0, 10):
     numbers[i].clicked.connect(defs_numbers[str(i)])
 
 button_plus.clicked.connect(a_plus)
+button_minus.clicked.connect(a_minus)
+button_devision.clicked.connect(a_devision)
+button_multi.clicked.connect(a_multi)
+button_dot.clicked.connect(a_dot)
+button_percent.clicked.connect(a_percent)
+button_C.clicked.connect(a_C)
+button_AC.clicked.connect(a_AC)
 
 def a_equals():
     global total_str
     total_int = 0
-    total_list = total_str.split('+')
-    for i in total_list:
-        total_int += int(i)
-    total.setText(str(total_int))
+    total_list = []
+
+    # 100+200*10
+    count_symbols = 0
+    for i in range(0,len(total_str)):
+        if total_str[i] == '+' or total_str[i] == '-' or total_str[i] == '*' or total_str[i] == '/':
+            if count_symbols != 0:
+                tmp = total_str[i-count_symbols:i]
+                try:
+                    total_list.append(int(tmp))
+                except:
+                    total_list.append(float(tmp))
+                total_list.append(total_str[i])
+                count_symbols = 0
+            else:
+                count_symbols += 1
+        elif i == len(total_str) - 1:
+            tmp = total_str[i-count_symbols:i+1]
+            try:
+                total_list.append(int(tmp))
+            except:
+                total_list.append(float(tmp))
+        else:
+            count_symbols += 1
+    while len(total_list) != 1:
+        for i in range(0, len(total_list)):
+            if total_list[i] == "*":
+                total_list[i] = total_list[i-1] * total_list[i+1]
+                del total_list[i+1]
+                del total_list[i-1]
+                break
+            elif total_list[i] == "/":
+                total_list[i] = total_list[i-1] / total_list[i+1]
+                del total_list[i+1]
+                del total_list[i-1]
+                break
+            elif '*' not in total_list and "/" not in total_list:
+                if total_list[i] == "+":
+                    total_list[i] = total_list[i-1] + total_list[i+1]
+                    del total_list[i+1]
+                    del total_list[i-1]
+                    break
+                elif total_list[i] == "-":
+                    total_list[i] = total_list[i-1] - total_list[i+1]
+                    del total_list[i+1]
+                    del total_list[i-1]
+                    break
+    total.setText(str(total_list[0]))
+    total_str = str(total_list[0])
 button_equals.clicked.connect(a_equals)
 
 
