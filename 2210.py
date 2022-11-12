@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import(
                     QHBoxLayout )
 app = QApplication([])
 window = QWidget()                    
-window.resize(360, 600)
+window.setFixedSize(360, 500)
 window.setWindowTitle("Калькулятор")
 window.setStyleSheet('''
 *{
@@ -23,12 +23,19 @@ QPushButton{
     }''')
 
 main_layout = QVBoxLayout()
+main_layout.setSpacing(0)
 h1_layout = QHBoxLayout()
+h1_layout.setSpacing(12)
 h2_layout = QHBoxLayout()
+h2_layout.setSpacing(12)
 h3_layout = QHBoxLayout()
+h3_layout.setSpacing(12)
 h4_layout = QHBoxLayout()
+h4_layout.setSpacing(12)
 h5_layout = QHBoxLayout()
+h5_layout.setSpacing(12)
 h6_layout = QHBoxLayout()
+h6_layout.setSpacing(12)
 
 total = QLabel('')
 total_str = ''
@@ -63,7 +70,7 @@ for number in range(10):
     numbers.append(QPushButton(str(number)))
     numbers[-1].setStyleSheet('''
     background-color: #7D7D7D; ''')
-numbers[0].setStyleSheet('''width: 150px;
+numbers[0].setStyleSheet('''width: 152px;
 background-color: #7D7D7D;''')
 k = 1
 h6_layout.addWidget(numbers[0])
@@ -132,30 +139,106 @@ def a0():
     global total_str
     total_str += '0'
     total.setText(total_str)
+blocked = ['-', '+', '.', '*', '/']
+
 def a_plus():
     global total_str
-    total_str += '+'
-    total.setText(total_str)
+    if total_str != "":
+        if total_str[-1] not in blocked:
+            total_str += '+'
+            total.setText(total_str)
 def a_minus():
     global total_str
-    total_str += '-'
-    total.setText(total_str)
+    if len(total_str) >= 2:
+        if total_str[-1] != '.':
+            if total_str[-1] in blocked and total_str[-2] in blocked:
+                pass
+            else:
+                total_str += '-'
+                total.setText(total_str)
+    else:
+        if total_str != '-':
+            total_str += '-'
+            total.setText(total_str)
+
 def a_devision():
     global total_str
-    total_str += '/'
-    total.setText(total_str)
+    if total_str != "":
+        if total_str[-1] not in blocked:
+            total_str += '/'
+            total.setText(total_str)
 def a_multi():
     global total_str
-    total_str += '*'
-    total.setText(total_str)
+    if total_str != "":
+        if total_str[-1] not in blocked:
+            total_str += '*'
+            total.setText(total_str)
 def a_dot():
     global total_str
-    total_str += '.'
-    total.setText(total_str)
-def a_percent():
-    global total_str
-    total_str += '%'
-    total.setText(total_str)
+    if total_str != "":
+        if total_str[-1] not in blocked:
+            total_str += '.'
+            total.setText(total_str) 
+# def a_percent():
+#     global total_str
+#     temp = []
+#     if total_str != "":
+#         if total_str[-1] not in blocked:
+#             for i in range(len(total_str)):
+#                 if total_str[(i + 1) * -1] in blocked:
+#                     if total_str[(i + 1) * -1] == '-':
+#                         if total_str[(i + 1) * -1 - 1] in blocked:
+#                             temp.append(total_str[(i + 1) * -1])
+#                             continue
+#                         else:
+#                             temp.reverse()
+#                             temp_str = ''
+#                             for i in temp:
+#                                 temp_str += i
+#                             temp_float = float(temp_str)
+#                             temp_float = temp_float / 100
+#                             break
+
+#                     elif total_str[(i + 1) * -1] == '.':
+#                         temp.append(total_str[(i + 1) * -1])
+#                     else:
+#                         temp.reverse()
+#                         temp_str = ''
+#                         for i in temp:
+#                             temp_str += i
+#                         temp_float = float(temp_str)
+#                         temp_float = temp_float / 100
+#                         break
+#                 else
+#                     temp.append(total_str[(i + 1) * -1])
+#             for i in range(len(total_str)):
+#                 if total_str[(i + 1) * -1] in blocked:
+#                     if total_str[(i + 1) * -1] == '-':
+#                         if total_str[(i + 1) * -1 - 1] in blocked:
+#                             continue
+#                         else:
+                            
+#                             total_list = list(total_str)
+#                             for j in range(i):
+#                                 del total_list[(j+1) * -1]
+#                             total_list.append(str(temp_float))
+#                             total_str = ''
+#                             for k in total_list:
+#                                 total_str += k
+#                             break
+#                     elif total_str[(i + 1) * -1] == '.':
+#                         continue
+#                     else:
+#                         total_list = list(total_str)
+#                         for j in range(i):
+#                             del total_list[(j+1) * -1]
+#                         total_list.append(str(temp_float))
+#                         total_str = ''
+#                         for k in total_list:
+#                             total_str += k
+#                         break
+#             total.setText(total_str)
+ 
 def a_AC():
     global total_str
     total.clear()
@@ -190,14 +273,17 @@ button_minus.clicked.connect(a_minus)
 button_devision.clicked.connect(a_devision)
 button_multi.clicked.connect(a_multi)
 button_dot.clicked.connect(a_dot)
-button_percent.clicked.connect(a_percent)
+# button_percent.clicked.connect(a_percent)
 button_C.clicked.connect(a_C)
 button_AC.clicked.connect(a_AC)
 
 def a_equals():
     global total_str
+    if total_str[-1] in blocked:
+        a_C()
     total_int = 0
     total_list = []
+
 
     # 100+200*10
     count_symbols = 0
