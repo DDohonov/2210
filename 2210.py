@@ -176,68 +176,15 @@ def a_multi():
 def a_dot():
     global total_str
     if total_str != "":
-        if total_str[-1] not in blocked:
+        if total_str[-1] not in blocked and total_str[-1] != "%":
             total_str += '.'
             total.setText(total_str) 
-# def a_percent():
-#     global total_str
-#     temp = []
-#     if total_str != "":
-#         if total_str[-1] not in blocked:
-#             for i in range(len(total_str)):
-#                 if total_str[(i + 1) * -1] in blocked:
-#                     if total_str[(i + 1) * -1] == '-':
-#                         if total_str[(i + 1) * -1 - 1] in blocked:
-#                             temp.append(total_str[(i + 1) * -1])
-#                             continue
-#                         else:
-#                             temp.reverse()
-#                             temp_str = ''
-#                             for i in temp:
-#                                 temp_str += i
-#                             temp_float = float(temp_str)
-#                             temp_float = temp_float / 100
-#                             break
-
-#                     elif total_str[(i + 1) * -1] == '.':
-#                         temp.append(total_str[(i + 1) * -1])
-#                     else:
-#                         temp.reverse()
-#                         temp_str = ''
-#                         for i in temp:
-#                             temp_str += i
-#                         temp_float = float(temp_str)
-#                         temp_float = temp_float / 100
-#                         break
-#                 else
-#                     temp.append(total_str[(i + 1) * -1])
-#             for i in range(len(total_str)):
-#                 if total_str[(i + 1) * -1] in blocked:
-#                     if total_str[(i + 1) * -1] == '-':
-#                         if total_str[(i + 1) * -1 - 1] in blocked:
-#                             continue
-#                         else:
-                            
-#                             total_list = list(total_str)
-#                             for j in range(i):
-#                                 del total_list[(j+1) * -1]
-#                             total_list.append(str(temp_float))
-#                             total_str = ''
-#                             for k in total_list:
-#                                 total_str += k
-#                             break
-#                     elif total_str[(i + 1) * -1] == '.':
-#                         continue
-#                     else:
-#                         total_list = list(total_str)
-#                         for j in range(i):
-#                             del total_list[(j+1) * -1]
-#                         total_list.append(str(temp_float))
-#                         total_str = ''
-#                         for k in total_list:
-#                             total_str += k
-#                         break
-#             total.setText(total_str)
+def a_percent():
+    global total_str
+    if total_str != "":
+        if total_str[-1] not in blocked and total_str[-1] != "%":
+            total_str += '%'
+            total.setText(total_str)
  
 def a_AC():
     global total_str
@@ -273,7 +220,7 @@ button_minus.clicked.connect(a_minus)
 button_devision.clicked.connect(a_devision)
 button_multi.clicked.connect(a_multi)
 button_dot.clicked.connect(a_dot)
-# button_percent.clicked.connect(a_percent)
+button_percent.clicked.connect(a_percent)
 button_C.clicked.connect(a_C)
 button_AC.clicked.connect(a_AC)
 
@@ -288,13 +235,20 @@ def a_equals():
     # 100+200*10
     count_symbols = 0
     for i in range(0,len(total_str)):
-        if total_str[i] == '+' or total_str[i] == '-' or total_str[i] == '*' or total_str[i] == '/':
+        if (total_str[i] == '+' or 
+            total_str[i] == '-' or 
+            total_str[i] == '*' or 
+            total_str[i] == '/' or 
+            total_str[i] == '%'):
             if count_symbols != 0:
                 tmp = total_str[i-count_symbols:i]
                 try:
                     total_list.append(int(tmp))
                 except:
                     total_list.append(float(tmp))
+                total_list.append(total_str[i])
+                count_symbols = 0
+            elif total_str[i-1] == '%':
                 total_list.append(total_str[i])
                 count_symbols = 0
             else:
@@ -307,9 +261,23 @@ def a_equals():
                 total_list.append(float(tmp))
         else:
             count_symbols += 1
+    print(total_list)
     while len(total_list) != 1:
         for i in range(0, len(total_list)):
-            if total_list[i] == "*":
+            if total_list[i] == "%":
+                # 81% - 100 + 200
+                # 100  -   50    %
+                # i-3 i-2  i-1   i
+                if i == 1:
+                    total_list[0]= total_list[0]/100
+                    del total_list[1]
+                    break
+                else:
+                    total_list[i-1] = total_list[i-3]/100*total_list[i-1]
+                    print(total_list[i-1])
+                    del total_list[i]
+                    break
+            elif total_list[i] == "*":
                 total_list[i] = total_list[i-1] * total_list[i+1]
                 del total_list[i+1]
                 del total_list[i-1]
@@ -319,7 +287,9 @@ def a_equals():
                 del total_list[i+1]
                 del total_list[i-1]
                 break
-            elif '*' not in total_list and "/" not in total_list:
+            elif ('*' not in total_list and 
+                    "/" not in total_list and 
+                    '%' not in total_list):
                 if total_list[i] == "+":
                     total_list[i] = total_list[i-1] + total_list[i+1]
                     del total_list[i+1]
